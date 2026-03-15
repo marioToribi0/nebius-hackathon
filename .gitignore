@@ -1,0 +1,117 @@
+# ====================
+# Python / FastAPI
+# ====================
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+*.egg
+*.egg-info/
+dist/
+build/
+eggs/
+parts/
+var/
+sdist/
+develop-eggs/
+.installed.cfg
+lib/
+lib64/
+.eggs/
+
+# Virtual environments
+.venv/
+venv/
+ENV/
+env/
+env.bak/
+venv.bak/
+
+# Distribution / packaging
+.Python
+pip-log.txt
+pip-delete-this-directory.txt
+MANIFEST
+
+# Unit test / coverage
+htmlcov/
+.tox/
+.nox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+*.py,cover
+.hypothesis/
+.pytest_cache/
+pytestdebug.log
+
+# mypy / pyright
+.mypy_cache/
+.dmypy.json
+dmypy.json
+.pyright/
+
+# Ruff / linting
+.ruff_cache/
+
+# ====================
+# Next.js / Node
+# ====================
+node_modules/
+.next/
+out/
+build/
+
+# Next.js cache
+.next/cache/
+
+# npm / yarn / pnpm
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+.yarn/cache
+.yarn/unplugged
+.yarn/build-state.yml
+.yarn/install-state.gz
+.pnp.*
+
+# TypeScript
+*.tsbuildinfo
+next-env.d.ts
+
+# ====================
+# Environment variables
+# ====================
+.env
+.env.*
+!.env.example
+!.env.*.example
+
+# ====================
+# Editors & OS
+# ====================
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+*~
+.idea/
+.vscode/
+*.sublime-project
+*.sublime-workspace
+
+# ====================
+# Docker
+# ====================
+.dockerignore
+docker-compose.override.yml
+
+# ====================
+# Logs
+# ====================
+logs/
+*.log
