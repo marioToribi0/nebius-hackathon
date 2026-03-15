@@ -119,9 +119,20 @@ function MapSearch({ onPlaceFound }: MapSearchProps) {
 interface MapInnerProps {
   places: Place[];
   onPlaceFound?: (name: string, lat: number, lng: number) => void;
+  focusedCoords?: { lat: number; lng: number };
 }
 
-export default function MapInner({ places, onPlaceFound }: MapInnerProps) {
+function FlyTo({ coords }: { coords?: { lat: number; lng: number } }) {
+  const map = useMap();
+  useEffect(() => {
+    if (coords) {
+      map.flyTo([coords.lat, coords.lng], 10, { animate: true, duration: 1.2 });
+    }
+  }, [coords, map]);
+  return null;
+}
+
+export default function MapInner({ places, onPlaceFound, focusedCoords }: MapInnerProps) {
   useEffect(() => {
     L.Marker.prototype.options.icon = defaultIcon;
   }, []);
@@ -137,6 +148,9 @@ export default function MapInner({ places, onPlaceFound }: MapInnerProps) {
     <MapContainer
       center={center}
       zoom={placesWithCoords.length > 0 ? 5 : 2}
+      minZoom={2}
+      maxBounds={[[-85.051129, -180], [85.051129, 180]]}
+      maxBoundsViscosity={1.0}
       className="h-full w-full rounded-xl"
       style={{ minHeight: "400px" }}
     >
@@ -145,6 +159,7 @@ export default function MapInner({ places, onPlaceFound }: MapInnerProps) {
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
       />
       <MapSearch onPlaceFound={onPlaceFound} />
+      <FlyTo coords={focusedCoords} />
       {placesWithCoords.map((place) => (
         <Marker
           key={place.id}

@@ -8,7 +8,6 @@ import { cn } from "@/lib/utils";
 const nav = [
   { href: "/dashboard", label: "Explore", icon: Compass },
   { href: "/discover", label: "Discover", icon: Search },
-  { href: "/places", label: "My Places", icon: MapPin },
 ];
 
 export function Sidebar() {

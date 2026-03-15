@@ -1,39 +1,37 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { X, Loader2 } from "lucide-react";
+import { X, Loader2, Copy, Check, QrCode } from "lucide-react";
 import { placesApi, researchApi } from "@/lib/api";
+import { researchStore, generatePlaceKey } from "@/lib/researchStore";
 import type { Place, TripQuestion } from "@/lib/types";
 
 interface TripPlanModalProps {
   place: Place;
+  /** If provided, skip straight to the QR display */
+  existingPlaceKey?: string;
   onClose: () => void;
+  onResearchStart?: (placeId: string) => void;
+  onResearchComplete: (placeId: string, placeKey: string) => void;
 }
 
 type Step = "questions" | "review" | "processing" | "qr";
 
-function slugify(text: string): string {
-  return text
-    .toLowerCase()
-    .trim()
-    .replace(/[^\w\s-]/g, "")
-    .replace(/[\s_]+/g, "-")
-    .replace(/-+/g, "-")
-    .replace(/^-|-$/g, "");
-}
-
-export function TripPlanModal({ place, onClose }: TripPlanModalProps) {
-  const [step, setStep] = useState<Step>("questions");
+export function TripPlanModal({ place, existingPlaceKey, onClose, onResearchStart, onResearchComplete }: TripPlanModalProps) {
+  const [step, setStep] = useState<Step>(existingPlaceKey ? "qr" : "questions");
   const [questions, setQuestions] = useState<TripQuestion[]>([]);
   const [answers, setAnswers] = useState<string[]>([]);
-  const [loadingQuestions, setLoadingQuestions] = useState(true);
+  const [loadingQuestions, setLoadingQuestions] = useState(!existingPlaceKey);
+  const [placeKey] = useState<string>(existingPlaceKey ?? generatePlaceKey());
   const [qrCode, setQrCode] = useState<string>("");
+  const [loadingQR, setLoadingQR] = useState(!!existingPlaceKey);
+  const [copied, setCopied] = useState(false);
   const [error, setError] = useState<string>("");
   const pollingRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
-  const placeKey = slugify(place.name) || place.id;
-
+  // Load questions (new flow)
   useEffect(() => {
+    if (existingPlaceKey) return;
     placesApi
       .getQuestions(place.id)
       .then((qs) => {
@@ -45,11 +43,28 @@ export function TripPlanModal({ place, onClose }: TripPlanModalProps) {
         setError("Failed to load questions. Please try again.");
         setLoadingQuestions(false);
       });
+  }, [place.id, existingPlaceKey]);
 
+  // Fetch QR if showing existing research
+  useEffect(() => {
+    if (!existingPlaceKey) return;
+    researchApi
+      .getQR(existingPlaceKey)
+      .then((qr) => {
+        setQrCode(qr);
+        setLoadingQR(false);
+      })
+      .catch(() => {
+        setError("Could not load QR code.");
+        setLoadingQR(false);
+      });
+  }, [existingPlaceKey]);
+
+  useEffect(() => {
     return () => {
       if (pollingRef.current) clearInterval(pollingRef.current);
     };
-  }, [place.id]);
+  }, []);
 
   async function handleSendToAI() {
     setStep("processing");
@@ -57,6 +72,9 @@ export function TripPlanModal({ place, onClose }: TripPlanModalProps) {
     questions.forEach((q, i) => {
       if (answers[i]) tripContext[q.question] = answers[i];
     });
+
+    researchStore.set(place.id, { place_key: placeKey, status: "processing" });
+    onResearchStart?.(place.id);
 
     try {
       await researchApi.trigger(place.name, placeKey, tripContext);
@@ -76,9 +94,12 @@ export function TripPlanModal({ place, onClose }: TripPlanModalProps) {
           clearInterval(pollingRef.current!);
           const qr = await researchApi.getQR(placeKey);
           setQrCode(qr);
+          researchStore.set(place.id, { place_key: placeKey, status: "completed" });
+          onResearchComplete(place.id, placeKey);
           setStep("qr");
         } else if (res.status === "failed") {
           clearInterval(pollingRef.current!);
+          researchStore.remove(place.id);
           setError("Research failed: " + (res.error ?? "unknown error"));
           setStep("review");
         }
@@ -86,6 +107,13 @@ export function TripPlanModal({ place, onClose }: TripPlanModalProps) {
         // keep polling on transient errors
       }
     }, 3000);
+  }
+
+  function handleCopy() {
+    navigator.clipboard.writeText(placeKey).then(() => {
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    });
   }
 
   return (
@@ -96,10 +124,7 @@ export function TripPlanModal({ place, onClose }: TripPlanModalProps) {
           <h2 className="text-lg font-bold font-[family-name:var(--font-playfair)] text-foreground">
             {step === "qr" ? "Your Trip is Ready!" : `Prepare Your Trip to ${place.name}`}
           </h2>
-          <button
-            onClick={onClose}
-            className="text-muted-foreground hover:text-foreground transition-colors"
-          >
+          <button onClick={onClose} className="text-muted-foreground hover:text-foreground transition-colors">
             <X className="h-5 w-5" />
           </button>
         </div>
@@ -193,19 +218,47 @@ export function TripPlanModal({ place, onClose }: TripPlanModalProps) {
 
           {/* Step: QR */}
           {step === "qr" && (
-            <div className="flex flex-col items-center gap-4">
-              <p className="text-sm text-muted-foreground text-center">
-                Show this QR code to the robot guide to start your personalised tour of{" "}
-                <strong>{place.name}</strong>.
-              </p>
-              {qrCode && (
-                <img
-                  src={qrCode}
-                  alt="Trip QR code"
-                  className="w-56 h-56 rounded-xl border-4 border-[#B45309] shadow-lg"
-                />
+            <div className="flex flex-col items-center gap-5">
+              {loadingQR ? (
+                <div className="flex items-center gap-2 py-8 text-muted-foreground">
+                  <Loader2 className="h-5 w-5 animate-spin" />
+                  <span>Loading QR code…</span>
+                </div>
+              ) : (
+                <>
+                  <p className="text-sm text-muted-foreground text-center">
+                    Show this QR code to the robot guide to start your personalised tour of{" "}
+                    <strong>{place.name}</strong>.
+                  </p>
+
+                  {qrCode && (
+                    <img
+                      src={qrCode}
+                      alt="Trip QR code"
+                      className="w-52 h-52 rounded-xl border-4 border-[#B45309] shadow-lg"
+                    />
+                  )}
+
+                  {/* Trip code + copy */}
+                  <div className="flex items-center gap-2 bg-secondary px-4 py-2 rounded-lg">
+                    <QrCode className="h-4 w-4 text-muted-foreground shrink-0" />
+                    <span className="font-mono text-lg font-bold tracking-widest text-foreground">
+                      {placeKey.toUpperCase()}
+                    </span>
+                    <button
+                      onClick={handleCopy}
+                      className="ml-1 p-1 rounded hover:bg-border transition-colors text-muted-foreground hover:text-foreground"
+                      aria-label="Copy code"
+                    >
+                      {copied ? <Check className="h-4 w-4 text-green-600" /> : <Copy className="h-4 w-4" />}
+                    </button>
+                  </div>
+
+                  <p className="text-xs text-muted-foreground">
+                    Point the robot&apos;s camera at the QR code or type the code above
+                  </p>
+                </>
               )}
-              <p className="text-xs text-muted-foreground">Point the robot&apos;s camera at this QR code</p>
             </div>
           )}
         </div>
@@ -214,10 +267,7 @@ export function TripPlanModal({ place, onClose }: TripPlanModalProps) {
         <div className="p-6 border-t border-border flex justify-end gap-3">
           {step === "questions" && !loadingQuestions && (
             <>
-              <button
-                onClick={onClose}
-                className="px-4 py-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
-              >
+              <button onClick={onClose} className="px-4 py-2 text-sm text-muted-foreground hover:text-foreground transition-colors">
                 Cancel
               </button>
               <button
@@ -230,10 +280,7 @@ export function TripPlanModal({ place, onClose }: TripPlanModalProps) {
           )}
           {step === "review" && (
             <>
-              <button
-                onClick={() => setStep("questions")}
-                className="px-4 py-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
-              >
+              <button onClick={() => setStep("questions")} className="px-4 py-2 text-sm text-muted-foreground hover:text-foreground transition-colors">
                 Back
               </button>
               <button
