@@ -4,16 +4,23 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.core.config import settings
+from app.core.logging import configure_logging, logger
 from app.databases.mongodb import connect_mongo, disconnect_mongo
 from app.databases.redis import connect_redis, disconnect_redis
-from app.routers import auth, embeddings, routes
+from app.routers import auth, embeddings, research, routes
+
+configure_logging(level="DEBUG" if settings.DEBUG else "INFO")
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
+    logger.info("Starting up {}", settings.APP_NAME)
     await connect_mongo()
+    logger.info("MongoDB connected")
     await connect_redis()
+    logger.info("Redis connected")
     yield
+    logger.info("Shutting down {}", settings.APP_NAME)
     await disconnect_redis()
     await disconnect_mongo()
 
@@ -37,6 +44,7 @@ app.add_middleware(
 app.include_router(auth.router)
 app.include_router(routes.router)
 app.include_router(embeddings.router)
+app.include_router(research.router)
 
 
 @app.get("/api/health")

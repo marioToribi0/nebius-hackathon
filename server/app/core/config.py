@@ -22,6 +22,11 @@ class Settings(BaseSettings):
 
     # Nebius AI Studio
     NEBIUS_API_KEY: str = ""
+    NEBIUS_BASE_URL: str = "https://api.tokenfactory.us-central1.nebius.com/v1/"
+    NEBIUS_CHAT_MODEL: str = "nvidia/nemotron-3-super-120b-a12b"
+
+    # Tavily Search
+    TAVILY_API_KEY: str = ""
 
     # CORS
     ALLOWED_ORIGINS: list[str] = ["http://localhost:3000"]
