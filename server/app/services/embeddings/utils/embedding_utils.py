@@ -1,20 +1,20 @@
 from functools import lru_cache
 
 from langchain_community.vectorstores import Redis as RedisVectorStore
-from langchain_openai import OpenAIEmbeddings
+from langchain_nebius import NebiusEmbeddings
 
 from app.core.config import settings
 
-EMBEDDING_MODEL = "text-embedding-3-large"
+EMBEDDING_MODEL = "BAAI/bge-en-icl"
 DEFAULT_INDEX_NAME = "wayfinder_embeddings"
 
 
 @lru_cache(maxsize=1)
-def get_embeddings() -> OpenAIEmbeddings:
-    """Return a cached OpenAI embeddings instance using text-embedding-3-large."""
-    return OpenAIEmbeddings(
+def get_embeddings() -> NebiusEmbeddings:
+    """Return a cached Nebius embeddings instance using BAAI/bge-en-icl."""
+    return NebiusEmbeddings(
         model=EMBEDDING_MODEL,
-        api_key=settings.OPENAI_API_KEY,
+        api_key=settings.NEBIUS_API_KEY,
     )
 
 
@@ -33,8 +33,6 @@ def get_vector_store(index_name: str = DEFAULT_INDEX_NAME) -> RedisVectorStore:
             index_name=index_name,
         )
     except Exception:
-        # Index does not exist yet — create an empty one with a placeholder schema.
-        # The real schema is created on first document ingestion.
         return RedisVectorStore(
             embedding=embeddings,
             redis_url=settings.REDIS_URL,

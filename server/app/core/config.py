@@ -20,8 +20,8 @@ class Settings(BaseSettings):
     # Redis
     REDIS_URL: str = "redis://localhost:6379"
 
-    # OpenAI
-    OPENAI_API_KEY: str = ""
+    # Nebius AI Studio
+    NEBIUS_API_KEY: str = ""
 
     # CORS
     ALLOWED_ORIGINS: list[str] = ["http://localhost:3000"]
