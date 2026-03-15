@@ -2,12 +2,13 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Compass, MapPin, Search } from "lucide-react";
+import { Compass, MapPin, MessageCircle, Search } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const nav = [
   { href: "/dashboard", label: "Explore", icon: Compass },
   { href: "/discover", label: "Discover", icon: Search },
+  { href: "/guide", label: "Guide", icon: MessageCircle },
 ];
 
 export function Sidebar() {

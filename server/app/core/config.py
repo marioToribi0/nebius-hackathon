@@ -31,6 +31,14 @@ class Settings(BaseSettings):
     # Tavily Search
     TAVILY_API_KEY: str = ""
 
+    # Guide agent
+    NEBIUS_GUIDE_MODEL: str = ""  # Falls back to NEBIUS_CHAT_MODEL if empty
+
+    # ElevenLabs TTS
+    ELEVENLABS_API_KEY: str = ""
+    ELEVENLABS_VOICE_ID: str = "21m00Tcm4TlvDq8ikWAM"  # "Rachel" default
+    ELEVENLABS_MODEL_ID: str = "eleven_monolingual_v1"
+
     # CORS
     ALLOWED_ORIGINS: list[str] = ["http://localhost:3000"]
 

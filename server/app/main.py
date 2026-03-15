@@ -7,7 +7,7 @@ from app.core.config import settings
 from app.core.logging import configure_logging, logger
 from app.databases.mongodb import connect_mongo, disconnect_mongo
 from app.databases.redis import connect_redis, disconnect_redis
-from app.routers import auth, embeddings, places, research, routes
+from app.routers import auth, embeddings, guide, places, research, routes
 
 configure_logging(level="DEBUG" if settings.DEBUG else "INFO")
 
@@ -46,6 +46,7 @@ app.include_router(routes.router)
 app.include_router(embeddings.router)
 app.include_router(research.router)
 app.include_router(places.router)
+app.include_router(guide.router)
 
 
 @app.get("/api/health")
