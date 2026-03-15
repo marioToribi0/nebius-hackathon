@@ -152,6 +152,11 @@ async def search_and_plan(state: ResearchState) -> dict:
 
     user_prompt = f"Place: {place_name}\n\nSearch results:\n{context}"
 
+    trip_context = state.get("trip_context") or {}
+    if trip_context:
+        prefs = "\n".join(f"- {q}: {a}" for q, a in trip_context.items())
+        user_prompt += f"\n\nVisitor preferences:\n{prefs}\nAdapt the route plan to these preferences."
+
     logger.info("[{}] search_and_plan | calling LLM ({})", place_key, settings.NEBIUS_CHAT_MODEL)
     raw = await _chat(system_prompt, user_prompt)
     logger.debug("[{}] search_and_plan | LLM raw response length={}", place_key, len(raw))

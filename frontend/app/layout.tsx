@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { DM_Sans, JetBrains_Mono, Syne } from "next/font/google";
+import { DM_Sans, JetBrains_Mono, Playfair_Display } from "next/font/google";
 import "./globals.css";
 import { AuthProvider } from "@/components/auth/AuthProvider";
 import { Toaster } from "sonner";
@@ -14,14 +14,14 @@ const jetbrainsMono = JetBrains_Mono({
   subsets: ["latin"],
 });
 
-const syne = Syne({
-  variable: "--font-syne",
+const playfair = Playfair_Display({
+  variable: "--font-playfair",
   subsets: ["latin"],
 });
 
 export const metadata: Metadata = {
-  title: "Wayfinder G1 — Command Interface",
-  description: "Neural command interface for the Wayfinder G1 robotic tour guide",
+  title: "Wayfinder — Discover Beautiful Places",
+  description: "Discover and save beautiful travel destinations around the world",
 };
 
 export default function RootLayout({
@@ -30,20 +30,20 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="dark">
+    <html lang="en">
       <body
-        className={`${dmSans.variable} ${jetbrainsMono.variable} ${syne.variable} antialiased`}
+        className={`${dmSans.variable} ${jetbrainsMono.variable} ${playfair.variable} antialiased`}
       >
         <AuthProvider>
           {children}
         </AuthProvider>
         <Toaster
-          theme="dark"
+          theme="light"
           toastOptions={{
             style: {
-              background: "#0A1628",
-              border: "1px solid rgba(0,212,255,0.2)",
-              color: "#e2e8f0",
+              background: "#FFFFFF",
+              border: "1px solid #E7E0D8",
+              color: "#1C1917",
             },
           }}
         />

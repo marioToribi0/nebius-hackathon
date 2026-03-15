@@ -45,6 +45,10 @@ class ResearchRequest(BaseModel):
         description="URL-safe slug for the place (e.g. catedral-de-sal)",
         pattern=r"^[a-z0-9]+(?:-[a-z0-9]+)*$",
     )
+    trip_context: dict[str, str] = Field(
+        default_factory=dict,
+        description="Q&A pairs collected from the user before triggering research",
+    )
 
 
 class PlaceResearchPublic(BaseModel):

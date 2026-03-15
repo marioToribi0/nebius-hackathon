@@ -11,9 +11,13 @@ Endpoints:
 """
 
 import asyncio
+import base64
+import io
 import uuid
 from datetime import datetime, timezone
 from typing import Annotated
+
+import qrcode
 
 from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, status
 from langchain_community.vectorstores import Redis as RedisVectorStore
@@ -114,11 +118,11 @@ async def _mark_status(place_key: str, status_val: str, error: str | None = None
     await db[_COLLECTION].update_one({"place_key": place_key}, {"$set": update})
 
 
-async def _run_agent_task(place_name: str, place_key: str):
+async def _run_agent_task(place_name: str, place_key: str, trip_context: dict[str, str] | None = None):
     """Background task: run the research agent, update status on failure."""
     logger.info("[{}] agent task started for {!r}", place_key, place_name)
     try:
-        await run_research_agent(place_name, place_key)
+        await run_research_agent(place_name, place_key, trip_context=trip_context or {})
         logger.info("[{}] agent task completed successfully", place_key)
     except Exception as exc:
         logger.error("[{}] agent task failed: {}", place_key, exc)
@@ -178,7 +182,9 @@ async def trigger_research(
         payload.place_name,
         current_user.id,
     )
-    background_tasks.add_task(_run_agent_task, payload.place_name, payload.place_key)
+    background_tasks.add_task(
+        _run_agent_task, payload.place_name, payload.place_key, payload.trip_context
+    )
 
     return ResearchStatusPublic(place_key=payload.place_key, status="processing")
 
@@ -321,6 +327,26 @@ async def sync_embeddings(place_key: str, current_user: CurrentUser):
 
     logger.info("[{}] sync_embeddings | completed, embedded {} docs", place_key, len(documents))
     return ResearchStatusPublic(place_key=place_key, status="completed")
+
+
+@router.get("/{place_key}/qr")
+async def get_qr_code(place_key: str, current_user: CurrentUser):
+    """Generate a QR code PNG (base64 data URL) encoding the place_key."""
+    db = get_database()
+    doc = await db[_COLLECTION].find_one({"place_key": place_key}, {"status": 1})
+    if not doc:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=_NOT_FOUND)
+    if doc.get("status") != "completed":
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail="Research not yet completed.",
+        )
+
+    img = qrcode.make(place_key)
+    buf = io.BytesIO()
+    img.save(buf, format="PNG")
+    b64 = base64.b64encode(buf.getvalue()).decode()
+    return {"qr_code": f"data:image/png;base64,{b64}"}
 
 
 @router.delete("/{place_key}", status_code=status.HTTP_204_NO_CONTENT)

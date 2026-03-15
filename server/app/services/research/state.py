@@ -25,6 +25,7 @@ class StopDocument(TypedDict):
 class ResearchState(TypedDict):
     place_name: str
     place_key: str
+    trip_context: dict[str, str]
 
     # Populated by search_and_plan
     overview_results: list[SearchResult]

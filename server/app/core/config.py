@@ -25,6 +25,9 @@ class Settings(BaseSettings):
     NEBIUS_BASE_URL: str = "https://api.tokenfactory.us-central1.nebius.com/v1/"
     NEBIUS_CHAT_MODEL: str = "nvidia/nemotron-3-super-120b-a12b"
 
+    # Pexels
+    PEXELS_API_KEY: str = ""
+
     # Tavily Search
     TAVILY_API_KEY: str = ""
 

@@ -2,31 +2,31 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Bot, Cpu, LayoutDashboard, Map, Network } from "lucide-react";
+import { Compass, MapPin, Search } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const nav = [
-  { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
-  { href: "/routes", label: "Routes", icon: Map },
-  { href: "/embeddings", label: "Embeddings", icon: Network },
+  { href: "/dashboard", label: "Explore", icon: Compass },
+  { href: "/discover", label: "Discover", icon: Search },
+  { href: "/places", label: "My Places", icon: MapPin },
 ];
 
 export function Sidebar() {
   const pathname = usePathname();
 
   return (
-    <aside className="flex h-full w-60 flex-col bg-[#091020] border-r border-[#00D4FF]/08">
+    <aside className="flex h-full w-60 flex-col border-r border-border bg-card">
       {/* Logo */}
-      <div className="flex items-center gap-3 px-5 py-5 border-b border-[#00D4FF]/08">
-        <div className="flex h-9 w-9 items-center justify-center rounded-lg border border-[#00D4FF]/30 bg-[#00D4FF]/10 animate-glow-pulse">
-          <Cpu className="h-5 w-5 text-[#00D4FF]" />
+      <div className="flex items-center gap-3 px-5 py-5 border-b border-border">
+        <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary/10">
+          <Compass className="h-5 w-5 text-primary" />
         </div>
         <div>
-          <p className="text-sm font-bold text-white font-[family-name:var(--font-syne)] tracking-wide">
-            WAYFINDER
+          <p className="text-sm font-bold text-foreground font-[family-name:var(--font-playfair)] tracking-wide">
+            Wayfinder
           </p>
-          <p className="text-[10px] font-mono text-[#00D4FF]/50 tracking-widest">
-            G1 SYSTEM
+          <p className="text-[10px] text-muted-foreground tracking-widest uppercase">
+            Travel Discovery
           </p>
         </div>
       </div>
@@ -42,32 +42,26 @@ export function Sidebar() {
               className={cn(
                 "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm transition-all",
                 active
-                  ? "bg-[#00D4FF]/10 text-[#00D4FF] border border-[#00D4FF]/20"
-                  : "text-slate-400 hover:bg-white/5 hover:text-slate-200"
+                  ? "bg-primary/10 text-primary border border-primary/20"
+                  : "text-muted-foreground hover:bg-secondary hover:text-foreground"
               )}
             >
-              <Icon className={cn("h-4 w-4", active && "text-[#00D4FF]")} />
-              <span className={cn("font-mono text-xs tracking-wider uppercase", active && "text-[#00D4FF]")}>
+              <Icon className={cn("h-4 w-4", active && "text-primary")} />
+              <span className={cn("text-sm", active && "font-medium text-primary")}>
                 {label}
               </span>
-              {active && (
-                <span className="ml-auto h-1.5 w-1.5 rounded-full bg-[#00D4FF] animate-pulse" />
-              )}
             </Link>
           );
         })}
       </nav>
 
-      {/* Robot status badge */}
-      <div className="p-4 border-t border-[#00D4FF]/08">
-        <div className="flex items-center gap-3 rounded-lg bg-[#00D4FF]/5 border border-[#00D4FF]/15 px-3 py-2.5">
-          <div className="relative">
-            <Bot className="h-5 w-5 text-[#00D4FF]" />
-            <span className="absolute -top-0.5 -right-0.5 h-2 w-2 rounded-full bg-emerald-400 animate-pulse-ring" />
-          </div>
+      {/* Brand footer */}
+      <div className="p-4 border-t border-border">
+        <div className="flex items-center gap-3 rounded-lg bg-accent/5 border border-accent/15 px-3 py-2.5">
+          <MapPin className="h-5 w-5 text-accent" />
           <div>
-            <p className="text-xs font-mono text-[#00D4FF] tracking-wider">ROBOT ONLINE</p>
-            <p className="text-[10px] text-slate-500">Unit G1-001</p>
+            <p className="text-xs font-medium text-accent">Discover the world</p>
+            <p className="text-[10px] text-muted-foreground">Find your next adventure</p>
           </div>
         </div>
       </div>

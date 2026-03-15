@@ -28,7 +28,11 @@ def _build_graph():
     return builder.compile()
 
 
-async def run_research_agent(place_name: str, place_key: str) -> None:
+async def run_research_agent(
+    place_name: str,
+    place_key: str,
+    trip_context: dict[str, str] | None = None,
+) -> None:
     """
     Execute the full research pipeline for a tourism place.
 
@@ -39,6 +43,7 @@ async def run_research_agent(place_name: str, place_key: str) -> None:
     initial_state: ResearchState = {
         "place_name": place_name,
         "place_key": place_key,
+        "trip_context": trip_context or {},
         "overview_results": [],
         "route_plan": "",
         "stops": [],

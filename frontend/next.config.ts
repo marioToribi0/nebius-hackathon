@@ -1,9 +1,13 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  // Exclude node_modules from file watching to reduce inotify instances
-  watchOptions: {
-    ignored: ["**/node_modules/**", "**/.git/**"],
+  images: {
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "images.pexels.com",
+      },
+    ],
   },
   async rewrites() {
     return [
