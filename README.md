@@ -123,7 +123,7 @@ cp .env.example .env
 # Edit .env with your actual secrets (see Environment Variables section)
 
 # 4. Run the development server
-uv run uvicorn app.main:app --reload --port 8000
+uv run uvicorn app.main:app --reload --port 8000 --reload-dir app
 ```
 
 The API will be available at `http://localhost:8000`.  
