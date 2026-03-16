@@ -1,0 +1,32 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "wayfinder-robot"
+version = "0.1.0"
+description = "Wayfinder G1 robot agent"
+requires-python = ">=3.11"
+dependencies = [
+    "opencv-python>=4.9.0",
+    "pyzbar>=0.1.9",
+    "pillow>=10.0.0",
+    "pyaudio>=0.2.14",
+    "webrtcvad>=2.0.10",
+    "setuptools>=70.0.0", # webrtcvad uses pkg_resources, removed in Python 3.13
+    "openai>=1.0.0",
+    "langgraph>=0.4.0",
+    "langchain>=0.3.0",
+    "langchain-openai>=0.3.0",
+    "tavily-python>=0.5.0",
+    "httpx>=0.28.0",
+    "elevenlabs>=1.0.0",
+    "sounddevice>=0.5.0",
+    "numpy>=1.26.0",
+    "python-dotenv>=1.0.0",
+    "loguru>=0.7.0",
+    "pydantic-settings>=2.0.0",
+]
+
+[tool.hatch.build.targets.wheel]
+packages = ["."]

@@ -39,6 +39,9 @@ class Settings(BaseSettings):
     ELEVENLABS_VOICE_ID: str = "21m00Tcm4TlvDq8ikWAM"  # "Rachel" default
     ELEVENLABS_MODEL_ID: str = "eleven_monolingual_v1"
 
+    # Robot API
+    ROBOT_API_KEY: str = ""
+
     # CORS
     ALLOWED_ORIGINS: list[str] = ["http://localhost:3000"]
 

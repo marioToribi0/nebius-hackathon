@@ -8,7 +8,6 @@ import { ChatInput } from "@/components/guide/ChatInput";
 import { useGuideSocket } from "@/hooks/useGuideSocket";
 import type { ResearchedPlace } from "@/lib/types";
 import { Bot, Compass, MessageCircle, Sparkles } from "lucide-react";
-import Image from "next/image";
 import Link from "next/link";
 
 export default function GuidePage() {
@@ -37,20 +36,15 @@ export default function GuidePage() {
         {!selectedPlace ? (
           /* Empty state */
           <div className="flex-1 flex items-center justify-center animate-fade-in-up">
-            <div className="text-center max-w-md">
-              <div className="relative mx-auto mb-6 h-48 w-48 rounded-2xl overflow-hidden border border-border shadow-sm">
-                <Image
-                  src="/robot-hero.jpg"
-                  alt="Wayfinder guide robot"
-                  fill
-                  className="object-cover"
-                />
+            <div className="text-center max-w-sm">
+              <div className="mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-2xl bg-accent/10 border border-accent/15">
+                <Bot className="h-8 w-8 text-accent" />
               </div>
               <h3 className="text-lg font-bold text-foreground font-[family-name:var(--font-playfair)] mb-2">
-                Your personal tour guide awaits
+                Select a place to get started
               </h3>
               <p className="text-sm text-muted-foreground leading-relaxed mb-5">
-                Select a researched place above to start a conversation. Ask about history,
+                Choose a researched destination above and start chatting about its history,
                 attractions, local tips, or current events.
               </p>
               <div className="flex flex-wrap justify-center gap-2">
