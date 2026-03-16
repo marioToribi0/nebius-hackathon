@@ -74,20 +74,10 @@ class ProactiveLoop:
             frame_b64 = base64.b64encode(buf.tobytes()).decode()
 
             msg = HumanMessage(
-                content=[
-                    {
-                        "type": "image_url",
-                        "image_url": {"url": f"data:image/jpeg;base64,{frame_b64}"},
-                    },
-                    {
-                        "type": "text",
-                        "text": (
-                            "Proactive check: look at the current view and decide if there is anything "
-                            "useful to tell the visitor. If you see a point of interest, obstacle, or "
-                            "something related to the tour, speak about it. Otherwise stay silent."
-                        ),
-                    },
-                ]
+                content=(
+                    "Proactive check: based on the tour progress, is there anything useful to tell "
+                    "the visitor right now? If so, use the speak tool. Otherwise stay silent."
+                )
             )
 
             state["current_frame"] = frame_b64

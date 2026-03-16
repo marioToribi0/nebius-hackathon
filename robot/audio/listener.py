@@ -73,12 +73,17 @@ class AudioListener:
         vad = webrtcvad.Vad(settings.VAD_AGGRESSIVENESS)
         pa = pyaudio.PyAudio()
 
+        device_kwargs = {}
+        if settings.AUDIO_DEVICE_INDEX >= 0:
+            device_kwargs["input_device_index"] = settings.AUDIO_DEVICE_INDEX
+
         stream = pa.open(
             rate=_SAMPLE_RATE,
             channels=_CHANNELS,
             format=pyaudio.paInt16,
             input=True,
             frames_per_buffer=_FRAME_SIZE // _SAMPLE_WIDTH,
+            **device_kwargs,
         )
 
         state = _State.SILENT
@@ -92,9 +97,22 @@ class AudioListener:
                 frame = stream.read(_FRAME_SIZE // _SAMPLE_WIDTH, exception_on_overflow=False)
 
                 if self._mute_event.is_set():
+                    # Flush whatever was being recorded before going silent
+                    if state == _State.RECORDING and buffer:
+                        pcm = b"".join(buffer)
+                        wav = _pcm_to_wav(pcm)
+                        self._out_queue.put(wav)
+                        logger.debug(
+                            "VAD: mute flush, emitted {} bytes ({} frames)",
+                            len(pcm),
+                            len(buffer),
+                        )
                     state = _State.SILENT
                     buffer.clear()
                     silence_count = 0
+                    # Wait until unmuted before reading more frames
+                    while self._mute_event.is_set() and not self._stop_event.is_set():
+                        self._stop_event.wait(timeout=0.05)
                     continue
 
                 is_speech = vad.is_speech(frame, _SAMPLE_RATE)

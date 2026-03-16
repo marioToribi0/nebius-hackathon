@@ -103,8 +103,7 @@ def _build_system_prompt(state: AgentState) -> str:
         "- Use **retrieve_rag** for deeper details about any topic at this place.\n"
         "- Use **capture_frame** if you need to see the current environment.\n"
         f"- {next_instruction}\n"
-        "- If the visitor asks a question mid-stop, answer it, then continue with the current stop.\n"
-        "- You receive a camera frame with each message — use it to understand the environment."
+        "- If the visitor asks a question mid-stop, answer it, then continue with the current stop."
     )
 
 

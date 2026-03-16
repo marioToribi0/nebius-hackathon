@@ -1,8 +1,12 @@
+from pathlib import Path
+
 from pydantic_settings import BaseSettings, SettingsConfigDict
+
+_ENV_FILE = Path(__file__).resolve().parent / ".env"
 
 
 class RobotSettings(BaseSettings):
-    model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8")
+    model_config = SettingsConfigDict(env_file=str(_ENV_FILE), env_file_encoding="utf-8")
 
     # Nebius / OpenAI-compatible LLM
     NEBIUS_API_KEY: str = ""
@@ -34,6 +38,9 @@ class RobotSettings(BaseSettings):
 
     # Camera
     CAMERA_INDEX: int = 0
+
+    # Audio input device index (-1 = system default, 7 = pulse on most Linux setups)
+    AUDIO_DEVICE_INDEX: int = 7
 
     # Proactive loop
     PROACTIVE_INTERVAL_SECS: float = 10.0
